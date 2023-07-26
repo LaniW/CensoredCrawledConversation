@@ -1,56 +1,29 @@
-import transformers
-import os
-import datetime
-import numpy as np
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers.utils import logging
+import torch
 
-global user_input
-user_input = ""
+logging.set_verbosity_info()
 
-class ChatBot():
-    def __init__(self, name):
-        print("----- Starting up", name, "-----")
-        self.name = name
-
-    def input_to_text(self):
-        user_input = input("Me  --> ")
-
-    @staticmethod
-    def text_to_response(text):
-        print("XLM-V (Common Crawl) --> ", text)
-        
-    def wake_up(self, text):
-        return True if self.name in str(user_input).lower() else False
-
-    @staticmethod
-    def action_time():
-        return datetime.datetime.now().time().strftime('%H:%M')
-
-if __name__ == "__main__":
-    
-    ai = ChatBot(name="XLM-V")
-    nlp = transformers.pipeline("conversational", model="facebook/xlm-v-base")
-    os.environ["TOKENIZERS_PARALLELISM"] = "true"
-    
-    ex=True
-    while ex:
-        ai.input_to_text()
-
-        if ai.wake_up(str(user_input)) is True:
-            res = "Hello I am XLM-V."
-        elif "time" in str(user_input):
-            res = ai.action_time()
-        elif any(i in str(user_input) for i in ["thank","thanks"]):
-            res = np.random.choice(["you're welcome!","anytime!","no problem!","cool!","I'm here if you need me!","mention not"])
-        elif any(i in str(user_input) for i in ["exit","close"]):
-            res = np.random.choice(["Tata","Have a good day","Bye","Goodbye","Hope to meet soon","peace out!"])
-            ex=False
-        else:   
-            if str(user_input)=="ERROR":
-                res="Sorry, come again?"
-            else:
-                chat = nlp(transformers.Conversation(str(user_input)), pad_token_id=50256)
-                res = str(chat)
-                res = res[res.find("bot >> ")+6:].strip()
-
-        ai.text_to_response(res)
-    print("----- Closing down XLM-V (Common Crawl) -----")
+model_name = "facebook/xlm-v-base"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
+print("XLM-V (Common Crawl)")
+for step in range(5):
+    text = input(">> You:")
+    input_ids = tokenizer.encode(text + tokenizer.eos_token, return_tensors="pt")
+    bot_input_ids = torch.cat([chat_history_ids, input_ids], dim=-1) if step > 0 else input_ids
+    chat_history_ids_list = model.generate(
+        bot_input_ids,
+        max_length=1000,
+        do_sample=True,
+        top_p=0.95,
+        top_k=50,
+        temperature=0.75,
+        num_return_sequences=5,
+        pad_token_id=tokenizer.eos_token_id
+    )
+    for i in range(len(chat_history_ids_list)):
+      output = tokenizer.decode(chat_history_ids_list[i][bot_input_ids.shape[-1]:], skip_special_tokens=True)
+      print(f"T5 {i}: {output}")
+    choice_index = int(input("Choose the response you want for the next input: "))
+    chat_history_ids = torch.unsqueeze(chat_history_ids_list[choice_index], dim=0)

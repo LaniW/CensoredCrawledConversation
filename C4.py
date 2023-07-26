@@ -1,13 +1,13 @@
-from transformers import AutoModelForCausalLM, AutoModelForSeq2Seq, AutoTokenizer
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import torch
 
-model_name = "facebook/xlm-v-base"
-tokenizer = AutoTokenizer.from_pretrained(model_name, padding_side='left')
-model = AutoModelForCausalLM.from_pretrained(model_name)
-print("====chatting 5 times with nucleus & top-k sampling & tweaking temperature & multiple sentences====")
+model_name = "google/t5-v1_1-small"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+print("T5 (C4)")
 for step in range(5):
     text = input(">> You:")
-    input_ids = tokenizer.encode(tokenizer.eos_token + text, return_tensors="pt")
+    input_ids = tokenizer.encode(text + tokenizer.eos_token, return_tensors="pt")
     bot_input_ids = torch.cat([chat_history_ids, input_ids], dim=-1) if step > 0 else input_ids
     chat_history_ids_list = model.generate(
         bot_input_ids,
