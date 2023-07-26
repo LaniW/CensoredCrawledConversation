@@ -1,13 +1,10 @@
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from transformers.utils import logging
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import torch
 
-logging.set_verbosity_info()
-
-model_name = "facebook/xlm-v-base"
+model_name = "google/flan-t5-small"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name)
-print("XLM-V (Common Crawl)")
+model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+print("Flan-T5 (Substitute Common Crawl)")
 for step in range(5):
     text = input(">> You:")
     input_ids = tokenizer.encode(text + tokenizer.eos_token, return_tensors="pt")
@@ -24,6 +21,6 @@ for step in range(5):
     )
     for i in range(len(chat_history_ids_list)):
       output = tokenizer.decode(chat_history_ids_list[i][bot_input_ids.shape[-1]:], skip_special_tokens=True)
-      print(f"T5 {i}: {output}")
+      print(f"Flan-T5 {i}: {output}")
     choice_index = int(input("Choose the response you want for the next input: "))
     chat_history_ids = torch.unsqueeze(chat_history_ids_list[choice_index], dim=0)
