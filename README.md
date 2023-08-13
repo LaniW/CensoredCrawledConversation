@@ -3,4 +3,4 @@ Text-To-Text Textbots to Demonstrate Output Differences Between Models Trained o
 
 [Google Colab](https://colab.research.google.com/drive/1Ij280nPyBPTbccCkOgm2BOWqVmnvZhY2?usp=sharing)  
 [Midterm Presentation](https://github.com/LaniW/CensoredCrawledConversation/files/12181169/LGBTQ.Terms.Datasets.and.Community.AI.pdf)  
-[] Add final paper here when finished (by 8/14/2023, ideally before 8/10/2023)
+[Final Research Paper](https://github.com/LaniW/CensoredCrawledConversation/files/12328753/LaniWangFinalPaper.CORRECTFORMATTING.pdf)
